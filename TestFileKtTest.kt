@@ -1,5 +1,6 @@
 import data.wrapper_classes.Result
 import domain.use_cases.LaunchProgramUseCase
+import domain.utils.KeyboardUtils
 import domain.utils.SoftwareUtils
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -10,13 +11,15 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.PrintStream
 
 
 class TestFileKtTest {
     @RelaxedMockK
     lateinit var softwareUtils: SoftwareUtils
+
+    @RelaxedMockK
+    lateinit var keyboardUtils: KeyboardUtils
 
     lateinit var launchProgramUseCase: LaunchProgramUseCase
 
@@ -31,7 +34,7 @@ class TestFileKtTest {
         MockKAnnotations.init(this)
         System.setOut(PrintStream(outContent))
         System.setErr(PrintStream(errContent))
-        launchProgramUseCase = LaunchProgramUseCase(softwareUtils)
+        launchProgramUseCase = LaunchProgramUseCase(softwareUtils, keyboardUtils)
 
 
     }
@@ -45,19 +48,6 @@ class TestFileKtTest {
             assert("file not found".lowercase() in outContent.toString().lowercase())
 
         }
-    }
-
-    @Test
-    fun `should print file found when non empty success result is returned`() {
-        val file = File("")
-        coEvery { softwareUtils.searchProgramPath(any(), any()) } returns flow { emit(Result.Success(file)) }
-        runBlocking {
-            launchProgramUseCase("test")
-            assert("file found :".lowercase() in outContent.toString().lowercase())
-
-        }
-
-
     }
 
     @After
