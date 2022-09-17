@@ -8,7 +8,8 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id("org.jetbrains.compose") version "1.1.0"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
@@ -17,6 +18,8 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    google()
 }
 
 dependencies {
@@ -38,9 +41,11 @@ dependencies {
 
     // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+
+    implementation(compose.desktop.currentOs)
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'Kotlin.automation.testing.AppKt'
+    mainClass = 'AppKt'
 }
