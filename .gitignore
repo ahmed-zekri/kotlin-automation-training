@@ -78,3 +78,10 @@ kotlin-ide/
 /.idea/vcs.xml
 /.crashdata/settings.dat
 /settings.ini
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+/.gitattributes
