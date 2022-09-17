@@ -85,3 +85,4 @@ kotlin-ide/
 # Ignore Gradle build output directory
 build
 /.gitattributes
+/.idea/uiDesigner.xml
