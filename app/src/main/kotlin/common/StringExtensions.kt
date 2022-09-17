@@ -23,7 +23,7 @@ fun String.runCommand(
         process.run {
             waitFor(5, TimeUnit.SECONDS)
             trySend(Result.Loading())
-            trySend(Result.Success(if (redirectToStdErr) null else inputStream.bufferedReader().readText()))
+            trySend(Result.Success(if (redirectToStdErr) "" else inputStream.bufferedReader().readText()))
 
             input?.apply {
                 if (input is Map<*, *> && input.values.isNotEmpty() && input.values.first() is String) {
