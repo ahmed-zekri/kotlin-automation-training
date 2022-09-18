@@ -6,20 +6,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.launch
+import presentation.types.MenuTypes
 
 @Composable
-fun mainMenu(exitApp: (() -> Unit)? = null, pushCodeFunction: suspend () -> Unit) {
+fun mainMenu(
+    mainMenuInteractor: MainMenuInteractor,
+    initializations: (suspend () -> Unit)? = null,
+    exitApp: (() -> Unit)? = null,
+    pushCodeFunction: suspend () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = null) {
+
+        initializations?.invoke()
+
+    }
 
 
 
@@ -53,10 +62,21 @@ fun mainMenu(exitApp: (() -> Unit)? = null, pushCodeFunction: suspend () -> Unit
 
                 Button(modifier = Modifier.align(Alignment.CenterHorizontally),
                     onClick = {
+                        mainMenuInteractor.setStateValue(MenuTypes.PushCode)
                         startPushCodeEvent()
                     }) {
                     Text("push code")
                 }
+
+                Text(
+                    text = when (mainMenuInteractor.uiState.value) {
+                        MenuTypes.Home -> "Home"
+                        MenuTypes.Exit -> "Exiting"
+
+
+                        MenuTypes.PushCode -> "Pushing code"
+                    }
+                )
             }
         }
     }
