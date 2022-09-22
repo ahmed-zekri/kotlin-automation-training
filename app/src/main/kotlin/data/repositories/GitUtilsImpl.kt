@@ -1,7 +1,7 @@
 package data.repositories
 
 import common.runCommand
-import domain.utils.GitUtils
+import domain.repositories.GitUtils
 
 
 class GitUtilsImpl : GitUtils {

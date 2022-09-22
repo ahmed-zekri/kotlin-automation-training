@@ -1,4 +1,4 @@
-package domain.utils
+package domain.repositories
 
 import data.wrapper_classes.Result
 import kotlinx.coroutines.flow.Flow

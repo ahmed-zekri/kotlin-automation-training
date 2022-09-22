@@ -1,9 +1,12 @@
 import androidx.compose.ui.window.application
+import data.remote.Api
 import data.repositories.GitUtilsImpl
 import data.repositories.KeyboardUtilsImpl
+import data.repositories.RemoteDataRepositoryImpl
 import domain.use_cases.PushCodeUseCase
-import domain.utils.GitUtils
-import domain.utils.KeyboardUtils
+import domain.repositories.GitUtils
+import domain.repositories.KeyboardUtils
+import domain.use_cases.GetCarsUseCase
 import presentation.MainMenuInteractor
 import presentation.mainMenu
 
@@ -14,7 +17,7 @@ private val pushCodeUseCase = PushCodeUseCase(gitUtils, keyboardUtils)
 
 suspend fun main() = application {
     mainMenu(
-        mainMenuInteractor = MainMenuInteractor(),
+        mainMenuInteractor = MainMenuInteractor(GetCarsUseCase(RemoteDataRepositoryImpl(Api.getInstance()))),
         initializations = { keyboardUtils.disableLogger() },
         exitApp = ::exitApplication
     ) {

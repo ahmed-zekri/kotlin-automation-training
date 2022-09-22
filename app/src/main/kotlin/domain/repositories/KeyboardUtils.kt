@@ -1,4 +1,4 @@
-package domain.utils
+package domain.repositories
 
 import kotlinx.coroutines.flow.Flow
 import org.jnativehook.keyboard.NativeKeyEvent

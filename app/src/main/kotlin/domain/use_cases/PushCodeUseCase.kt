@@ -1,8 +1,8 @@
 package domain.use_cases
 
 import data.wrapper_classes.Result
-import domain.utils.GitUtils
-import domain.utils.KeyboardUtils
+import domain.repositories.GitUtils
+import domain.repositories.KeyboardUtils
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

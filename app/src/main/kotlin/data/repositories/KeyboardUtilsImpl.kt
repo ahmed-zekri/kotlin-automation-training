@@ -1,6 +1,6 @@
 package data.repositories
 
-import domain.utils.KeyboardUtils
+import domain.repositories.KeyboardUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

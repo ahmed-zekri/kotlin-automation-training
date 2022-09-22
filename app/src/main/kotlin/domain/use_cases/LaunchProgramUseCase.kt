@@ -2,8 +2,8 @@ package domain.use_cases
 
 import common.runCommand
 import data.wrapper_classes.Result
-import domain.utils.KeyboardUtils
-import domain.utils.SoftwareUtils
+import domain.repositories.KeyboardUtils
+import domain.repositories.SoftwareUtils
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn

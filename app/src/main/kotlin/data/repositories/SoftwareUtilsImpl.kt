@@ -4,7 +4,7 @@ import common.FileFound
 import common.runCommand
 import data.wrapper_classes.Result
 import domain.data.Software
-import domain.utils.SoftwareUtils
+import domain.repositories.SoftwareUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.io.File
