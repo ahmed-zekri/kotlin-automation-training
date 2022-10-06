@@ -1,31 +1,25 @@
 package presentation
 
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
+import common.executeSuspendFunction
 import data.wrapper_classes.Result
-import kotlinx.coroutines.launch
 import presentation.types.MenuTypes
 
 
@@ -35,7 +29,8 @@ fun mainMenu(
     mainMenuInteractor: MainMenuInteractor,
     initializations: (suspend () -> Unit)? = null,
     exitApp: (() -> Unit)? = null,
-    pushCodeFunction: suspend () -> Unit
+    pushCodeFunction: suspend () -> Unit,
+    startInteractiveRebase: suspend () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -61,9 +56,6 @@ fun mainMenu(
 
                     mainMenuInteractor.getCars(scope = this)
                 }
-                val scrollState = rememberLazyListState(0)
-                val requester = remember { FocusRequester() }
-
 
                 when (carsListValue) {
                     is Result.Error -> Text(carsListValue.error ?: "Unknown error")
@@ -71,57 +63,11 @@ fun mainMenu(
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.TopCenter))
                     }
                     is Result.Success -> {
-
-
-                        if (scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == scrollState.layoutInfo.totalItemsCount - 1)
-                            LaunchedEffect(false) {
-                                mainMenuInteractor.getCars(this)
-                            }
-
-                        LaunchedEffect(Unit) {
-                            requester.requestFocus()
-                        }
-                        LazyColumn(
-                            state = scrollState,
-                            modifier = Modifier.draggable(
-                                orientation = Orientation.Vertical,
-                                state = rememberDraggableState { delta ->
-                                    coroutineScope.launch {
-                                        scrollState.scrollBy(-delta)
-                                    }
-                                },
-                            ).onKeyEvent { keyEvent ->
-                                coroutineScope.launch {
-                                    when (keyEvent.key) {
-                                        Key.Z ->
-                                            scrollState.scrollBy(-20f)
-                                        Key.S ->
-                                            scrollState.scrollBy(20f)
-
-                                    }
-
-                                }
-                                true
-
-                            }.focusRequester(requester)
-                                .focusable()
-                        ) {
-                            carsListValue.data?.apply {
-                                items(size) { index ->
-                                    this@apply[index].apply {
-                                        Column {
-                                            Text("Year : $year")
-                                            Text("Model : $category")
-                                            Text("Model : $model")
-
-                                        }
-                                        Spacer(Modifier.height(20.dp))
-
-                                    }
-                                }
-
-                            }
-                        }
+                        displayItems(
+                            coroutineScope = coroutineScope,
+                            mainMenuInteractor = mainMenuInteractor,
+                            carsListValue = carsListValue
+                        )
                     }
                 }
             }
@@ -134,12 +80,6 @@ fun mainMenu(
             title = "Compose for Desktop",
             state = rememberWindowState(width = 300.dp, height = 300.dp)
         ) {
-            val startPushCodeEvent = {
-                coroutineScope.launch {
-
-                    pushCodeFunction()
-                }
-            }
 
             MaterialTheme {
                 Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
@@ -157,9 +97,17 @@ fun mainMenu(
 
                     Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
                         mainMenuInteractor.setStateValue(MenuTypes.PushCode)
-                        startPushCodeEvent()
+                        pushCodeFunction.executeSuspendFunction(coroutineScope)
                     }) {
                         Text("push code")
+                    }
+
+                    Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
+                        mainMenuInteractor.setStateValue(MenuTypes.InteractiveRebase)
+                        startInteractiveRebase.executeSuspendFunction(coroutineScope)
+
+                    }) {
+                        Text("Interactive rebase")
                     }
 
                     Text(
@@ -169,6 +117,7 @@ fun mainMenu(
 
 
                             MenuTypes.PushCode -> "Pushing code"
+                            else -> ""
                         }
                     )
                 }

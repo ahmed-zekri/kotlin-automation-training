@@ -1,7 +1,10 @@
 package presentation
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import data.dto.Car
+import data.wrapper_classes.Result
 import domain.use_cases.GetCarsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,15 +13,16 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import presentation.types.MenuTypes
-import data.wrapper_classes.Result
 import java.util.*
 
-class MainMenuInteractor(private val getCarsUseCase: GetCarsUseCase) {
-    fun setStateValue(pushCode: MenuTypes.PushCode) {
-        _uiState.value = pushCode
+class MainMenuInteractor(
+    private val getCarsUseCase: GetCarsUseCase
+) {
+    fun setStateValue(menuType: MenuTypes) {
+        _uiState.value = menuType
     }
 
-    var pageNumber: Int = 1
+    private var pageNumber: Int = 1
 
     private val _uiState: MutableState<MenuTypes> = mutableStateOf(MenuTypes.Home)
     val uiState: State<MenuTypes> = _uiState
@@ -29,8 +33,7 @@ class MainMenuInteractor(private val getCarsUseCase: GetCarsUseCase) {
     val carsListState: State<Result<List<Car>>> = _carsListState
 
 
-    private
-    val _counterState: MutableState<String> = mutableStateOf("00:00")
+    private val _counterState: MutableState<String> = mutableStateOf("00:00")
     val counterState: State<String> = _counterState
 
     private val _loadNewScreen: MutableState<Boolean> = mutableStateOf(false)
@@ -55,20 +58,19 @@ class MainMenuInteractor(private val getCarsUseCase: GetCarsUseCase) {
         _loadNewScreen.value = value
     }
 
-
     fun getCars(scope: CoroutineScope) = scope.launch(Dispatchers.IO) {
 
         getCarsUseCase(page = pageNumber).onEach { result ->
-            when(result) {
-             is Result.Success-> {
-                 println(pageNumber)
-                 pageNumber++
-                 val previousList = carsListState.value.data?.toMutableList()
-                 if (previousList != result.data)
-                     previousList?.addAll(result.data!!)
-                 _carsListState.value =
-                     Result.Success(data = previousList ?: result.data)
-             }
+            when (result) {
+                is Result.Success<*> -> {
+                    println(pageNumber)
+                    pageNumber++
+                    val previousList = carsListState.value.data?.toMutableList()
+                    if (previousList != result.data)
+                        previousList?.addAll(result.data!!)
+                    _carsListState.value =
+                        Result.Success(data = previousList ?: result.data)
+                }
 
 
                 else -> {}
@@ -78,8 +80,3 @@ class MainMenuInteractor(private val getCarsUseCase: GetCarsUseCase) {
 
     }
 }
-
-
-
-
-
